@@ -9,6 +9,8 @@ from discord.ext import commands
 
 from utils import *
 
+from cogs.chat.modules.exceptions import NoApiKey
+
 
 # Set up the OpenAI API client
 openai.api_key = OPENAI_API_KEY
@@ -17,7 +19,7 @@ openai.api_key = OPENAI_API_KEY
 class Chat(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.model_engine = 'text-davinci-003'
+        self.model_engine = "text-davinci-003"
 
     def get_response(self, prompt):
         completion = openai.Completion.create(
@@ -28,7 +30,7 @@ class Chat(commands.Cog):
             stop=None,
             temperature=0.5,
         )
-        generated_text = completion.choices[0].text.strip('\n')
+        generated_text = completion.choices[0].text.strip("\n")
         return generated_text
 
     @commands.command()
@@ -41,4 +43,6 @@ class Chat(commands.Cog):
 
 
 async def setup(bot):
+    if OPENAI_API_KEY == None:
+        raise NoApiKey("OpenAI")
     await bot.add_cog(Chat(bot))

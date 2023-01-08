@@ -11,12 +11,12 @@ from utils import *
 
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix='cat>', intents=intents)
+bot = commands.Bot(command_prefix="cat>", intents=intents)
 
 
 @bot.event
 async def setup_hook():
-    print(f'{bot.user.name} has connected to Discord!')
+    print(f"{bot.user.name} has connected to Discord!")
 
 
 @bot.event
@@ -32,13 +32,19 @@ async def on_message(message):
 
 
 async def main():
-    cogs_dir = 'cogs'
-    for extension in [dirs for dirs in os.listdir(cogs_dir) if os.path.isdir(os.path.join(cogs_dir, dirs))]:
+    cogs_dir = "cogs"
+    for extension in [
+        dirs
+        for dirs in os.listdir(cogs_dir)
+        if os.path.isdir(os.path.join(cogs_dir, dirs))
+    ]:
+        if extension == "__pycache__":
+            continue
         try:
-            await bot.load_extension(cogs_dir + '.' + extension + '.' + extension)
+            await bot.load_extension(cogs_dir + "." + extension + "." + extension)
         except Exception as e:
             print(e)
-            print(f'Failed to load extension {extension}.')
+            print(f"Failed to load extension {extension}.")
     await bot.start(TOKEN)
 
 

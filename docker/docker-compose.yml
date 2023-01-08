@@ -1,0 +1,47 @@
+version: '3.1'
+
+services:
+  bot-dev:
+    image: pifdev:latest
+    stdin_open: true # docker run -i
+    tty: true # docker run -t
+    privileged: true
+    container_name: botdev
+    volumes:
+      - ./../:/pif/bot-playground
+      - /dev/:/dev/
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - ConfigFilePath=/config/HCMC/config.json
+      - UserCredentialsPath=./cert/HCM.creds
+    profiles:
+      - dev
+  bot-test:
+    image: botpif_test:latest
+    stdin_open: true # docker run -i
+    tty: true # docker run -t
+    privileged: true
+    container_name: bottest
+    volumes:
+      - ~/env:/env
+    environment:
+      - ContainerName=bottest
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - DISCORD_GUILD=${DISCORD_GUILD}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
+    profiles:
+      - test
+  bot-prod:
+    image: botpif:latest
+    restart: always
+    privileged: true
+    container_name: botprod
+    environment:
+      - ContainerName=botprod
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - DISCORD_GUILD=${DISCORD_GUILD}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
+    profiles:
+      - prod

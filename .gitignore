@@ -1,2 +1,5 @@
 prod_config.conf
 *.tar
+/venv
+test.*
+/test/*

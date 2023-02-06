@@ -48,12 +48,12 @@ class BotCommands(commands.Cog):
             await msg.edit(content="Done", embed=embed)
 
     @commands.command()
-    async def filters(ctx):
+    async def filters(self, ctx):
         pass
 
-    @commands.command()
-    async def help(ctx):
-        pass
+    # @commands.command()
+    # async def help(self, ctx):
+    #     pass
 
 
 async def setup(bot):

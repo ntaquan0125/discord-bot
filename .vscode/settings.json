@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
-        "./cogs/lib/database/src"
+        "./cogs/lib/database/src",
+        "./src/database/src"
     ]
 }

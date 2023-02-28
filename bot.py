@@ -13,7 +13,7 @@ from typing import *
 from pathlib import Path
 
 parent_dir_path = str(Path(__file__).resolve().parents[0])
-sys.path.append(parent_dir_path + "/cogs/lib/database/src")
+sys.path.append(parent_dir_path + "/src/database/src")
 
 from database import *
 

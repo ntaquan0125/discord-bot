@@ -3,6 +3,7 @@
 echo "Input number to choice release version or test version"
 echo "1: release"
 echo "2: test"
+echo "3: build"
 
 read release
 

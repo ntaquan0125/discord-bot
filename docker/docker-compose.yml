@@ -12,8 +12,10 @@ services:
       - /dev/:/dev/
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - ConfigFilePath=/config/HCMC/config.json
-      - UserCredentialsPath=./cert/HCM.creds
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - DISCORD_GUILD=${DISCORD_GUILD}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
     profiles:
       - dev
   bot-test:
@@ -45,3 +47,20 @@ services:
       - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
     profiles:
       - prod
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'test_pass'
+      MYSQL_USER: 'test'
+      MYSQL_PASS: 'pass'
+    profiles:
+      - prod
+      - dev
+      - test
+    volumes:
+      - ~/mysql:/var/lib/mysql
+
+volumes:
+  my-datavolume:

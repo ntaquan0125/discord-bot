@@ -29,7 +29,7 @@ class Chat(commands.Cog):
         return generated_text
 
     @commands.command()
-    async def turbo(self, ctx, *, arg):
+    async def chat(self, ctx, *, arg):
         generated_text = self.get_response(arg)
         await ctx.send(generated_text)
 

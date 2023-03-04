@@ -39,9 +39,3 @@ elif [[ "$architectures" == "2" ]]; then
     echo "x86_64/amd64 selected"
     docker buildx build --platform=linux/amd64 -f ./docker/Dockerfile -t ${name} ${target} .
 fi
-
-echo "Saving image as .tar file"
-
-echo ${pwds} | sudo -S docker save ${name} > ${name_file}
-
-echo "Done"

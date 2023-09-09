@@ -13,22 +13,26 @@ class AnimeFaceRegconition(commands.Cog):
         self.bot = bot
 
     def url_to_image(self, url):
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         resp = urllib.request.urlopen(req)
-        image = np.asarray(bytearray(resp.read()), dtype='uint8')
+        image = np.asarray(bytearray(resp.read()), dtype="uint8")
         image = cv2.imdecode(image, cv2.IMREAD_COLOR)
         return image
 
-    def detect(self, image, cascade_file = './cogs/anime_face/lbpcascade_animeface.xml'):
+    def detect(
+        self, image, cascade_file="./src/modules/anime_face/lbpcascade_animeface.xml"
+    ):
         cascade = cv2.CascadeClassifier(cascade_file)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         gray = cv2.equalizeHist(gray)
-        
-        faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(24, 24))
+
+        faces = cascade.detectMultiScale(
+            gray, scaleFactor=1.1, minNeighbors=5, minSize=(24, 24)
+        )
         if len(faces) > 0:
-            for (x, y, w, h) in faces:
+            for x, y, w, h in faces:
                 cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            cv2.imwrite('./cogs/anime_face/face_detected.png', image)
+            cv2.imwrite("./src/modules/anime_face/face_detected.png", image)
             return True
         return False
 
@@ -41,14 +45,12 @@ class AnimeFaceRegconition(commands.Cog):
             return
 
         try:
-            if message.attachments[0].url.lower().endswith(('.png', '.jpg', '.jpeg')):
+            if message.attachments[0].url.lower().endswith((".png", ".jpg", ".jpeg")):
                 image = self.url_to_image(message.attachments[0].url)
                 if self.detect(image):
-                    print_debug(self, 'Found face')
-                    await message.channel.send(file=discord.File('./cogs/anime_face/face_detected.png'))
+                    print_debug(self, "Found face")
+                    await message.channel.send(
+                        file=discord.File("./src/modules/anime_face/face_detected.png")
+                    )
         except IndexError:
             pass
-
-
-async def setup(bot):
-    await bot.add_cog(AnimeFaceRegconition(bot))

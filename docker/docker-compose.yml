@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   bot-dev:
-    image: pifdev:latest
+    image: botpif_dev:latest
     stdin_open: true # docker run -i
     tty: true # docker run -t
     privileged: true
@@ -16,6 +16,8 @@ services:
       - DISCORD_GUILD=${DISCORD_GUILD}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
+      - MONGO_DB_ROOT_USERNAME="root"
+      - MONGO_DB_ROOT_PASSWORD="root"
     profiles:
       - dev
   bot-test:
@@ -32,6 +34,8 @@ services:
       - DISCORD_GUILD=${DISCORD_GUILD}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
+      - MONGO_DB_ROOT_USERNAME="root"
+      - MONGO_DB_ROOT_PASSWORD="root"
     profiles:
       - test
   bot-prod:
@@ -45,22 +49,75 @@ services:
       - DISCORD_GUILD=${DISCORD_GUILD}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
+      - MONGO_DB_ROOT_USERNAME=${MONGO_DB_ROOT_USERNAME}
+      - MONGO_DB_ROOT_PASSWORD=${MONGO_DB_ROOT_PASSWORD}
     profiles:
       - prod
-  db:
-    image: mysql
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
+  mongo-dev:
+    image: mongo
+    container_name: mongo
     environment:
-      MYSQL_ROOT_PASSWORD: 'test_pass'
-      MYSQL_USER: 'test'
-      MYSQL_PASS: 'pass'
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./../database/db:/data/db
+      - ./../database/dev.archive:/Databases/dev.archive
+      - ./../database/production:/Databases/production
+    profiles:
+      - test
+      - dev
+  mongo-express-dev:
+    image: mongo-express
+    container_name: mexpress
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://root:password@mongo:27017/?authSource=admin
+      ME_CONFIG_BASICAUTH_USERNAME: mexpress
+      ME_CONFIG_BASICAUTH_PASSWORD: mexpress
+    links:
+      - mongo-dev
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    profiles:
+      - test
+      - dev
+  mongo-prod:
+    image: mongo
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_DB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_ROOT_PASSWORD}
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./../database/db:/data/db
+      - ./../database/dev.archive:/Databases/dev.archive
+      - ./../database/production:/Databases/production
     profiles:
       - prod
-      - dev
-      - test
-    volumes:
-      - ~/mysql:/var/lib/mysql
+  mongo-express-prod:
+    image: mongo-express
+    container_name: mexpress
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_DB_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_DB_ROOT_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_DB_ROOT_USERNAME}:${MONGO_DB_ROOT_PASSWORD}@mongo:27017/?authSource=admin
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_DB_ROOT_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_DB_ROOT_PASSWORD}
+    links:
+      - mongo-dev
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    profiles:
+      - prod
 
-volumes:
-  my-datavolume:
+networks:
+  mongo-compose-network:
+    driver: bridge

@@ -33,9 +33,6 @@ ADD ./requirements.txt /pif/bot-playground/
 RUN pip install --upgrade pip
 RUN pip install -r /pif/bot-playground/requirements.txt
 
-#Copy file
-ADD ./ /pif/bot-playground/
-
 WORKDIR /pif/bot-playground
 
 FROM main as prod

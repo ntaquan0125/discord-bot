@@ -26,6 +26,7 @@ elif [[ "$release" == "2" ]]; then
     target="--target dev"
 fi
 
+
 name_file="${name}.tar"
 docker_path="docker/Dockerfile"
 

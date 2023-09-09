@@ -346,3 +346,4 @@ error_log/
 config/test/
 .metals/
 *.tar.*
+database/

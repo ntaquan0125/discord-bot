@@ -1,6 +1,15 @@
 {
     "python.analysis.extraPaths": [
         "./cogs/lib/database/src",
-        "./src/database/src"
-    ]
+        "./src/database/src",
+        "./src",
+        "./src/modules/chat",
+        "./src/modules/command",
+        "./src/modules/event",
+        "./src/handler"
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none"
 }

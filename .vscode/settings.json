@@ -6,7 +6,9 @@
         "./src/modules/chat",
         "./src/modules/command",
         "./src/modules/event",
-        "./src/handler"
+        "./src/handler",
+        "./src/modules/member",
+        "./src/database"
     ],
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"

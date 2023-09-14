@@ -3,13 +3,13 @@ import discord
 import numpy as np
 import urllib.request
 
-from discord.ext import commands
+from discord.ext.commands import Cog, Bot
 
 from utils import *
 
 
-class AnimeFaceRegconition(commands.Cog):
-    def __init__(self, bot):
+class AnimeFaceRegconition(Cog):
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
     def url_to_image(self, url):
@@ -21,7 +21,7 @@ class AnimeFaceRegconition(commands.Cog):
 
     def detect(
         self, image, cascade_file="./src/modules/anime_face/lbpcascade_animeface.xml"
-    ):
+    ) -> bool:
         cascade = cv2.CascadeClassifier(cascade_file)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         gray = cv2.equalizeHist(gray)
@@ -36,8 +36,8 @@ class AnimeFaceRegconition(commands.Cog):
             return True
         return False
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
+    @Cog.listener()
+    async def on_message(self, message: discord.Message) -> None:
         if message.author == self.bot.user:
             return
 

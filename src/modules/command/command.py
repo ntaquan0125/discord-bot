@@ -8,22 +8,20 @@ import discord
 
 import aiohttp
 
-from utils import *
+from discord.ext.commands import Cog, Bot
+from discord import app_commands
 
+from utils import *
 from typing import *
 
 
-parent_dir_path = str(Path(__file__).resolve().parents[0])
-sys.path.append(parent_dir_path + "/src")
+class botCommands(Cog):
+    def __init__(self, bot: Bot) -> None:
+        super().__init__()
 
-from client import client
+        self.bot = bot
 
-
-class BotCommands:
-    def __init__(self):
-        pass
-
-    async def info(self) -> discord.Embed:
+    async def _info(self) -> discord.Embed:
         embed = discord.Embed(
             title="PIF Club's bot",
             description="Pay It Forward",
@@ -35,7 +33,7 @@ class BotCommands:
 
         return embed
 
-    async def random_cat(self) -> Union[discord.Embed, str]:
+    async def _random_cat(self) -> Union[discord.Embed, str]:
         try:
             main_url = "https://random.cat/view/" + str(random.randint(1, 1000))
             # response = requests.get(main_url)
@@ -61,14 +59,45 @@ class BotCommands:
             print(e)
             return "Some thing error"
 
-    async def ping(self) -> discord.Embed:
+    async def _ping(self) -> discord.Embed:
         embed = discord.Embed(
             title="Pong!",
-            description=f"Heartbeat: {round(client.latency * 1000, 2)} ms",
+            description=f"Heartbeat: {round(self.bot.latency * 1000, 2)} ms",
             color=discord.Color.random(),
         )
 
         return embed
 
+    @app_commands.command(
+        name="cat",
+        description="Just cat",
+    )
+    async def cat(self, interaction: discord.Interaction):
+        return_data = await self._random_cat()
+        try:
+            if type(return_data) == str:
+                await interaction.response.send_message(return_data, ephemeral=True)
+            else:
+                await interaction.response.send_message(
+                    "", embed=return_data, ephemeral=False
+                )
+        except:
+            await interaction.response.send_message("Some thing error", ephemeral=True)
 
-command = BotCommands()
+    @app_commands.command(
+        name="info",
+        description="Just info",
+    )
+    async def info(self, interaction: discord.Interaction):
+        await interaction.response.send_message(
+            "", embed=await self._info(), ephemeral=True
+        )
+
+    @app_commands.command(
+        name="ping",
+        description="Just ping",
+    )
+    async def ping(self, interaction: discord.Interaction):
+        await interaction.response.send_message(
+            "", embed=await self._ping(), ephemeral=True
+        )

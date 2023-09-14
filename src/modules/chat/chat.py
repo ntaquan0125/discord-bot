@@ -4,6 +4,9 @@ import os
 import sys
 
 import discord
+from discord.ext.commands import Cog
+from discord import app_commands
+
 import openai
 from openai.error import RateLimitError
 
@@ -14,16 +17,15 @@ from pathlib import Path
 parent_dir_path = str(Path(__file__).resolve().parents[1])
 sys.path.append(parent_dir_path + "/src")
 
-from client import client
 
+class botChatGPT(Cog):
+    def __init__(self, bot, api_key):
+        super().__init__()
 
-# Set up the OpenAI API client
-openai.api_key = "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"
+        self.bot = bot
 
-
-class ChatGPT:
-    def __init__(self):
         self.model_engine = "gpt-3.5-turbo"
+        openai.api_key = api_key
 
     def get_response(self, prompt):
         try:
@@ -43,5 +45,11 @@ class ChatGPT:
 
         return generated_text
 
-
-chat = ChatGPT()
+    @app_commands.command(
+        name="gpt",
+        description="Use GPT chat, it doesn't work right now",
+    )
+    @app_commands.describe(gpt_question="Question for GPT")
+    async def gpt(self, interaction: discord.Interaction, gpt_question: str):
+        generated_text = self.get_response(gpt_question)
+        await interaction.response.send_message(generated_text)

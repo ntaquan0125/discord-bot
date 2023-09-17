@@ -30,6 +30,8 @@ from handler_event_handler import botEvents
 
 from utils import *
 
+GUILD_ID = discord.Object(get_config_value("pif_guild_id"))
+
 
 class botDiscord(Bot):
     def __init__(self):
@@ -40,8 +42,8 @@ class botDiscord(Bot):
 
         self.database_handle = botDatabase(
             url=get_env_data("DATABASE_URL"),
-            database_name=get_env_data("DATABASE"),
-            collection_name=get_env_data("COLLECTION"),
+            database_name=get_config_value("database_name"),
+            collection_name=get_config_value("collection_name"),
         )
 
     async def setup_hook(self):

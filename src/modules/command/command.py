@@ -1,7 +1,7 @@
 import platform
 import requests
 import random
-import sys
+import ast
 from pathlib import Path
 
 import discord
@@ -59,6 +59,28 @@ class botCommands(Cog):
             print(e)
             return "Some thing error"
 
+    async def _random_anime_image(
+        self, type: str, choices: app_commands.Choice[str]
+    ) -> Union[discord.Embed, str]:
+        try:
+            main_url = "https://api.waifu.pics/" + type + "/" + choices.value
+            async with aiohttp.ClientSession() as session:
+                async with session.get(main_url) as response:
+                    if response.status == 200:
+                        response_body = await response.read()
+                        response_url = ast.literal_eval(response_body.decode("utf-8"))
+                        embed = discord.Embed(
+                            title="Your waifu 🐈", colour=discord.Color.random()
+                        )
+                        embed.set_image(url=response_url["url"])
+
+                        return embed
+
+            return "Error fetching data"
+        except Exception as e:
+            print(e)
+            return "Some thing error"
+
     async def _ping(self) -> discord.Embed:
         embed = discord.Embed(
             title="Pong!",
@@ -80,6 +102,56 @@ class botCommands(Cog):
             else:
                 await interaction.response.send_message(
                     "", embed=return_data, ephemeral=False
+                )
+        except:
+            await interaction.response.send_message("Some thing error", ephemeral=True)
+
+    @app_commands.command(
+        name="waifu",
+        description="Just waifu",
+    )
+    @app_commands.choices(
+        choices=[
+            app_commands.Choice(name="waifu", value="waifu"),
+            app_commands.Choice(name="lick", value="lick"),
+            app_commands.Choice(name="pat", value="pat"),
+        ]
+    )
+    async def waifu(
+        self, interaction: discord.Interaction, choices: app_commands.Choice[str]
+    ):
+        return_data = await self._random_anime_image(type="sfw", choices=choices)
+        try:
+            if type(return_data) == str:
+                await interaction.response.send_message(return_data, ephemeral=True)
+            else:
+                await interaction.response.send_message(
+                    "", embed=return_data, ephemeral=True
+                )
+        except:
+            await interaction.response.send_message("Some thing error", ephemeral=True)
+
+    @app_commands.command(
+        name="nsfw",
+        description="Just waifu",
+    )
+    @app_commands.choices(
+        choices=[
+            app_commands.Choice(name="waifu", value="waifu"),
+            app_commands.Choice(name="lick", value="lick"),
+            app_commands.Choice(name="pat", value="pat"),
+        ]
+    )
+    async def nsfw(
+        self, interaction: discord.Interaction, choices: app_commands.Choice[str]
+    ):
+        return_data = await self._random_anime_image(type="nsfw", choices=choices)
+        try:
+            if type(return_data) == str:
+                await interaction.response.send_message(return_data, ephemeral=True)
+            else:
+                await interaction.response.send_message(
+                    "", embed=return_data, ephemeral=True
                 )
         except:
             await interaction.response.send_message("Some thing error", ephemeral=True)

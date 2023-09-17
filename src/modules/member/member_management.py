@@ -1,14 +1,16 @@
-from typing import *
-
 import discord
 from discord.ext.commands import Cog, Bot
 from discord import app_commands
 
+from utils import *
 from typing import *
+
 from datetime import date, datetime
 
 from member_exception_handler import *
 from database_bot_database import botDatabase
+
+GUILD_ID = discord.Object(get_config_value("pif_guild_id"))
 
 
 class botMemberManagement(Cog):
@@ -18,6 +20,15 @@ class botMemberManagement(Cog):
         self.bot = bot
         self.database_handle = database_handle
 
+    async def check_guild_id(interaction: discord.Interaction) -> bool:
+        if interaction.guild_id == get_config_value("pif_guild_id"):
+            return True
+        else:
+            await interaction.response.send_message(
+                "You don't have permission", ephemeral=True
+            )
+            return False
+
     @app_commands.command(name="sign_up", description="Sign up your self to PIF bot")
     @app_commands.describe(
         name="Your name",
@@ -26,6 +37,7 @@ class botMemberManagement(Cog):
         phone="Your phone number",
         university_id="Your university ID",
     )
+    @app_commands.check(check_guild_id)
     async def sign_up_new_member(
         self,
         interaction: discord.Interaction,
@@ -72,6 +84,7 @@ class botMemberManagement(Cog):
         pifer_cxx="Course of C joining to PIF you want to change to",
     )
     @app_commands.checks.has_permissions(manage_roles=True)
+    @app_commands.check(check_guild_id)
     async def change_member_info(
         self,
         interaction: discord.Interaction,
@@ -83,6 +96,10 @@ class botMemberManagement(Cog):
         university_id: str = "",
         pifer_cxx: str = "",
     ):
+        if interaction.guild_id != get_config_value("pif_guild_id"):
+            await interaction.response.send_message(
+                "You not have permission", ephemeral=True
+            )
         try:
             discord_ID_database = discord_id[2 : len(discord_id) - 1]
 

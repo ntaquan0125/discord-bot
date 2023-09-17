@@ -1,0 +1,8 @@
+./database/
+./config/
+./docker/
+.env
+.gitignore
+*.sh
+*.md
+*.tar

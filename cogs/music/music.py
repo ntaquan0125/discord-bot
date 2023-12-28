@@ -1,13 +1,10 @@
 import asyncio
 import random
-
 import discord
 import yt_dlp as youtube_dl
 
 from typing import Union
 from discord.ext import commands
-
-from utils import *
 
 
 ytdl_format_options = {
@@ -21,7 +18,7 @@ ytdl_format_options = {
     'quiet': True,
     'no_warnings': True,
     'default_search': 'auto',
-    'source_address': '0.0.0.0',  # bind to ipv4 since ipv6 addresses cause issues sometimes
+    'source_address': '0.0.0.0',  # Bind to ipv4 since ipv6 addresses cause issues sometimes
 }
 
 ffmpeg_options = {
@@ -47,8 +44,9 @@ class YTDLSource(discord.PCMVolumeTransformer):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
         if 'entries' in data:
-            # Take first item from a playlist
+            # Take the first item from a playlist
             data = data['entries'][0]
+    
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
@@ -91,16 +89,13 @@ class Music(commands.Cog):
 
     @commands.command()
     async def play(self, ctx, *, url):
-        try:
-            source = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-            source.requester = ctx.author
-        except ytdl.YTDLError:
-            await ctx.send('An error occurred while processing this request.')
+        source = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+        source.requester = ctx.author
 
         if ctx.guild.id not in self.queues:
             self.queues[ctx.guild.id] = []
         self.queues[ctx.guild.id].append(source)
-        await ctx.send(f'{source.title} has been added to queue.')
+        await ctx.send(f'`{source.title}` has been added to queue.')
 
         await self.play_from_queue(ctx)
 
@@ -109,7 +104,10 @@ class Music(commands.Cog):
             if len(self.queues[ctx.guild.id]) > 0:
                 source = self.queues[ctx.guild.id].pop(0)
                 ctx.voice_client.play(source,
-                    after=lambda e: asyncio.run_coroutine_threadsafe(self.play_from_queue(ctx), self.bot.loop))
+                    after=lambda e: asyncio.run_coroutine_threadsafe(
+                        self.play_from_queue(ctx), self.bot.loop
+                        )
+                    )
 
                 embed = discord.Embed(
                     title='Now playing',

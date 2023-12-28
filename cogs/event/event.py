@@ -10,10 +10,10 @@ class BotEvents(commands.Cog):
         self.bot = bot
     
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member):
         await member.create_dm()
         await member.dm_channel.send(
-            f'Hi {member.name}, welcome to {GUILD}!'
+            f'Hi {member.name}, welcome!'
         )
         
 

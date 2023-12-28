@@ -1,23 +1,14 @@
 import cv2
 import discord
-import numpy as np
-import urllib.request
 
 from discord.ext import commands
 
-from utils import *
+from utils.media import get_image_from_url
 
 
 class AnimeFaceRegconition(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    def url_to_image(self, url):
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        resp = urllib.request.urlopen(req)
-        image = np.asarray(bytearray(resp.read()), dtype='uint8')
-        image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-        return image
 
     def detect(self, image, cascade_file = './cogs/anime_face/lbpcascade_animeface.xml'):
         cascade = cv2.CascadeClassifier(cascade_file)
@@ -33,18 +24,17 @@ class AnimeFaceRegconition(commands.Cog):
         return False
 
     @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.author == self.bot.user:
+    async def on_message(self, message: discord.Message):
+        if message.author.bot:
             return
-
+        
         if not self.bot.is_ready:
             return
 
         try:
             if message.attachments[0].url.lower().endswith(('.png', '.jpg', '.jpeg')):
-                image = self.url_to_image(message.attachments[0].url)
+                image = get_image_from_url(message.attachments[0].url)
                 if self.detect(image):
-                    print_debug(self, 'Found face')
                     await message.channel.send(file=discord.File('./cogs/anime_face/face_detected.png'))
         except IndexError:
             pass
